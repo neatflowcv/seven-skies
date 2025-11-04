@@ -17,5 +17,3 @@ func version() string {
 func main() {
 	log.Println("version", version())
 }
-
-// 1116578
