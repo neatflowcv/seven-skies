@@ -1,0 +1,80 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Default module",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/seven-skies/v1/skies": {
+      "get": {
+        "summary": "weather forecast",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sky"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "webhooks": {},
+  "components": {
+    "schemas": {
+      "Sky": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "high": {
+            "type": "number",
+            "description": "최고온도"
+          },
+          "low": {
+            "type": "number",
+            "description": "최저온도"
+          },
+          "weather": {
+            "$ref": "#/components/schemas/Weather"
+          }
+        },
+        "required": [
+          "date",
+          "high",
+          "low",
+          "weather"
+        ]
+      },
+      "Weather": {
+        "type": "string",
+        "enum": [
+          "Rain",
+          "Sunny",
+          "Cloudy",
+          "Snow"
+        ]
+      }
+    },
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

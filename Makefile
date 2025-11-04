@@ -6,6 +6,10 @@ build:
 install:
 	CGO_ENABLED=0 GOOS=linux go install ./cmd/...
 
+.PHONY: generate
+generate:
+	go generate ./...
+
 .PHONY: update
 update:
 	go get -u -t ./...
