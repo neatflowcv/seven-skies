@@ -48,6 +48,22 @@ model HourlyForecastList {
   items: HourlyForecast[];
 }
 
+model CreateForecastRequest {
+  time: offsetDateTime;
+
+  @doc("하루 동안의 예상 최고 기온(℃)")
+  high?: Celsius;
+
+  @doc("하루 동안의 예상 최저 기온(℃)")
+  low?: Celsius;
+
+  @doc("예상 기온(℃)")
+  temperature?: Celsius;
+
+  @doc("예상 날씨 상태")
+  condition: WeatherCondition;
+}
+
 @error
 model Error {
   @doc("에러 코드")
@@ -60,6 +76,15 @@ model Error {
 @route("/forecasts")
 @tag("Forecasts")
 interface Forecasts {
+  @post
+  @doc("internal API to create a forecast")
+  createForecast(@body body: CreateForecastRequest): {
+    @statusCode statusCode: 204;
+  } | {
+    @statusCode statusCode: 500;
+    @body body: Error;
+  };
+
   @get
   @route("/daily")
   listDaily(): {

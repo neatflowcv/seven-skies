@@ -4,7 +4,7 @@
 
 - <https://apihub.kma.go.kr/>
 
-### API
+### 기상청 API
 
 많은 API가 제공되나, 기상 예보를 위해서는 2개만 보면 된다.
 
@@ -72,3 +72,30 @@
 ### 평가
 
 다소 구식 인터페이스이지만, 한국에서 사실상 유일한 공공 기상 데이터 출처이므로 필수적으로 활용해야 한다.
+
+## OpenWeather
+
+- <https://openweathermap.org/>
+
+### 사용법 및 제한
+
+<https://openweathermap.org/api> 여기에 접속해서 일단 가입해야 한다.
+가입 후 몇 시간 정도는 지나야 API 사용할 수 있다.
+
+<https://openweathermap.org/full-price#current> 여기에서 Free 티어가 사용가능한 API가 명확히 나온다.
+
+- 3-hour Forecast 5 days 이거 하나만 쓰면 된다.
+- 2시간 마다 데이터가 업데이트 된다.
+  - 즉, 하루 12번만 호출하면 된다.
+- 1분에 최대 60회 가능하며, 한 달에 1,000,000회 호출이 가능하다.
+  - (1,000,000 / 30)
+
+### OpenWeather API
+
+#### Call 5 day / 3 hour forecast data
+
+<https://openweathermap.org/forecast5>
+
+형식: api.openweathermap.org/data/2.5/forecast?units=metric&lat={lat}&lon={lon}&appid={API key}
+
+<https://openweathermap.org/weather-conditions>
