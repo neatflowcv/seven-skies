@@ -6,3 +6,5 @@ linters:
     - depguard
     - tagliatelle
     - wsl # deprecated
+  build-tags:
+    - integration
