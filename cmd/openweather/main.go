@@ -26,11 +26,14 @@ func version() string {
 	return info.Main.Version
 }
 
-func main() {
-	log.Println("version", version())
+type Config struct {
+	Key     string
+	Lat     float64
+	Lon     float64
+	NATSURL string
+}
 
-	godotenv.Load()
-
+func NewConfig() (*Config, error) {
 	key := os.Getenv("OPENWEATHER_API_KEY")
 	if key == "" {
 		log.Panic("OPENWEATHER_API_KEY is not set")
@@ -51,7 +54,35 @@ func main() {
 		log.Panic("NATS_URL is not set")
 	}
 
-	broker, err := nats.NewBroker(context.Background(), NATS_URL, "SEVEN_SKIES_STREAM", []string{"SEVEN_SKIES_SUBJECT.>"})
+	latFloat, err := strconv.ParseFloat(lat, 64)
+	if err != nil {
+		log.Panic("error in parse lat", err)
+	}
+
+	lonFloat, err := strconv.ParseFloat(lon, 64)
+	if err != nil {
+		log.Panic("error in parse lon", err)
+	}
+
+	return &Config{
+		Key:     key,
+		Lat:     latFloat,
+		Lon:     lonFloat,
+		NATSURL: NATS_URL,
+	}, nil
+}
+
+func main() {
+	log.Println("version", version())
+
+	godotenv.Load()
+
+	config, err := NewConfig()
+	if err != nil {
+		log.Panic("error in create config", err)
+	}
+
+	broker, err := nats.NewBroker(context.Background(), config.NATSURL, "SEVEN_SKIES_STREAM", []string{"SEVEN_SKIES_SUBJECT.>"})
 	if err != nil {
 		log.Panic("error in create broker", err)
 	}
@@ -69,17 +100,7 @@ func main() {
 		}
 	}()
 
-	latFloat, err := strconv.ParseFloat(lat, 64)
-	if err != nil {
-		log.Panic("error in parse lat", err)
-	}
-
-	lonFloat, err := strconv.ParseFloat(lon, 64)
-	if err != nil {
-		log.Panic("error in parse lon", err)
-	}
-
-	err = Task(context.Background(), broker, key, latFloat, lonFloat)
+	err = Task(context.Background(), broker, config.Key, config.Lat, config.Lon)
 	if err != nil {
 		log.Panic("error in task", err)
 	}
@@ -91,9 +112,9 @@ func main() {
 			Task,
 			context.Background(),
 			broker,
-			key,
-			latFloat,
-			lonFloat,
+			config.Key,
+			config.Lat,
+			config.Lon,
 		),
 	)
 	if err != nil {
