@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -32,9 +33,7 @@ func (h *Handler) Handle(ctx context.Context) error {
 
 	forecast, err := openweather.Forecast(ctx, h.key, h.lat, h.lon)
 	if err != nil {
-		log.Println("error in get forecast", err)
-
-		return err
+		return fmt.Errorf("error in get forecast: %w", err)
 	}
 
 	log.Println("get forecast successfully", forecast)
@@ -42,13 +41,13 @@ func (h *Handler) Handle(ctx context.Context) error {
 	for _, list := range forecast.List {
 		weatherEvent := domain.WeatherEvent{
 			Date:        time.Unix(int64(list.Dt), 0),
-			Condition:   decideCondition(list.Weather[0].Main),
+			Condition:   decideCondition(list.Weather),
 			Temperature: &domain.Temperature{Value: domain.Celsius(list.Main.Temp)},
 			High:        &domain.Temperature{Value: domain.Celsius(list.Main.TempMax)},
 			Low:         &domain.Temperature{Value: domain.Celsius(list.Main.TempMin)},
 		}
 
-		message, err := json.Marshal(weatherEvent)
+		message, err := json.Marshal(&weatherEvent)
 		if err != nil {
 			log.Println("error in marshal weather event", err)
 
@@ -66,7 +65,12 @@ func (h *Handler) Handle(ctx context.Context) error {
 	return nil
 }
 
-func decideCondition(main string) domain.WeatherCondition {
+func decideCondition(weather []openweather.Weather) domain.WeatherCondition {
+	if len(weather) == 0 {
+		return domain.WeatherConditionUnknown
+	}
+
+	main := weather[0].Main
 	switch main {
 	case "Thunderstorm", "Drizzle", "Rain":
 		return domain.WeatherConditionRain

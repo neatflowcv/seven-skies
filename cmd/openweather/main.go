@@ -28,7 +28,7 @@ type Config struct {
 	NATSURL string
 }
 
-func NewConfig() (*Config, error) {
+func NewConfig() *Config {
 	key := os.Getenv("OPENWEATHER_API_KEY")
 	if key == "" {
 		log.Panic("OPENWEATHER_API_KEY is not set")
@@ -64,20 +64,22 @@ func NewConfig() (*Config, error) {
 		Lat:     latFloat,
 		Lon:     lonFloat,
 		NATSURL: NATS_URL,
-	}, nil
+	}
 }
 
 func main() {
 	log.Println("version", version())
 
-	godotenv.Load()
-
-	config, err := NewConfig()
-	if err != nil {
-		log.Panic("error in create config", err)
+	err := godotenv.Load()
+	if err == nil {
+		log.Println("env loaded")
 	}
 
-	broker, err := nats.NewBroker(context.Background(), config.NATSURL, "SEVEN_SKIES_STREAM", []string{"SEVEN_SKIES_SUBJECT.>"})
+	config := NewConfig()
+
+	ctx := context.Background()
+
+	broker, err := nats.NewBroker(ctx, config.NATSURL, "SEVEN_SKIES_STREAM", []string{"SEVEN_SKIES_SUBJECT.>"})
 	if err != nil {
 		log.Panic("error in create broker", err)
 	}
@@ -97,7 +99,7 @@ func main() {
 		}
 	}()
 
-	err = handler.Handle(context.Background())
+	err = handler.Handle(ctx)
 	if err != nil {
 		log.Panic("error in task", err)
 	}
