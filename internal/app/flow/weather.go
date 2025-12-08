@@ -9,3 +9,10 @@ type Weather struct {
 	Condition    string
 	Temperature  float64 // Celsius
 }
+
+type DailyWeather struct {
+	Date      time.Time
+	High      float64 // Celsius
+	Low       float64 // Celsius
+	Condition string
+}

@@ -7,5 +7,4 @@ linters:
     - tagliatelle
     - wsl # deprecated
     - varnamelen
-  build-tags:
-    - integration
+    - prealloc

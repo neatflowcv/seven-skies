@@ -5,10 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime/debug"
+	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/neatflowcv/seven-skies/api"
 	"github.com/neatflowcv/seven-skies/internal/app/flow"
 	"github.com/neatflowcv/seven-skies/internal/pkg/broker/nats"
 	"github.com/neatflowcv/seven-skies/internal/pkg/domain"
@@ -98,5 +102,25 @@ func main() {
 		log.Panic("error in subscribe", err)
 	}
 
-	select {}
+	err = serve(service)
+	if err != nil {
+		log.Panic("error in serve", err)
+	}
+}
+
+func serve(service *flow.Flow) error {
+	const timeout = 5 * time.Second
+
+	server := &http.Server{ //nolint:exhaustruct
+		ReadHeaderTimeout: timeout,
+		Handler:           api.HandlerFromMux(api.NewStrictHandler(NewHandler(service), nil), chi.NewRouter()),
+		Addr:              "0.0.0.0:8080",
+	}
+
+	err := server.ListenAndServe()
+	if err != nil {
+		return fmt.Errorf("error in listen and serve: %w", err)
+	}
+
+	return nil
 }

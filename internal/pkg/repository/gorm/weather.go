@@ -25,3 +25,14 @@ func newModelWeather(weather *domain.Weather) *Weather {
 		Temperature:  float64(weather.Temperature().Value),
 	}
 }
+
+func (w *Weather) toDomain() *domain.Weather {
+	return domain.NewWeather(
+		w.ID,
+		domain.WeatherSource(w.Source),
+		w.TargetDate,
+		w.ForecastDate,
+		domain.WeatherCondition(w.Condition),
+		domain.Temperature{Value: domain.Celsius(w.Temperature)},
+	)
+}

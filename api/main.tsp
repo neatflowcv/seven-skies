@@ -62,7 +62,16 @@ model Error {
 interface Forecasts {
   @get
   @route("/daily")
-  listDaily(): {
+  @doc("일일 날씨 예보 목록을 조회합니다.")
+  listDaily(
+    @query
+    @doc("타임존 (기본값: Asia/Seoul)")
+    timezone?: string,
+
+    @query
+    @doc("현재 시간 (기본값: 현재 시간)")
+    now?: offsetDateTime,
+  ): {
     @statusCode statusCode: 200;
     @body body: DailyForecastList;
   } | {
