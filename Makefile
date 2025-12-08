@@ -29,6 +29,10 @@ test:
 .PHONY: validate
 validate: fix test
 
+.PHONY: generate
+generate:
+	make -C api generate
+
 .PHONY: cover
 cover:
 	go test ./... --coverpkg ./... -coverprofile=c.out
