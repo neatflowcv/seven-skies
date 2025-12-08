@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/neatflowcv/seven-skies/internal/pkg/domain"
 	"github.com/neatflowcv/seven-skies/internal/pkg/repository"
@@ -41,4 +42,18 @@ func (r *Repository) CreateWeather(ctx context.Context, weather *domain.Weather)
 	}
 
 	return nil
+}
+
+func (r *Repository) ListWeathers(ctx context.Context, from, to time.Time) ([]*domain.Weather, error) {
+	weathers, err := gorm.G[*Weather](r.db).Where("target_date BETWEEN ? AND ?", from, to).Find(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list weathers: %w", err)
+	}
+
+	var ret []*domain.Weather
+	for _, weather := range weathers {
+		ret = append(ret, weather.toDomain())
+	}
+
+	return ret, nil
 }
