@@ -8,10 +8,18 @@ type Temperature struct {
 	Value Celsius `json:"value"`
 }
 
+type WeatherSource string
+
+const (
+	WeatherSourceOpenWeather WeatherSource = "openweather"
+	WeatherSourceKMA         WeatherSource = "kma"
+)
+
 type WeatherEvent struct {
-	Date        time.Time        `json:"date"`
-	Condition   WeatherCondition `json:"condition"`
-	Temperature *Temperature     `json:"temperature,omitempty"`
-	High        *Temperature     `json:"high,omitempty"`
-	Low         *Temperature     `json:"low,omitempty"`
+	// Source is the source of the weather event. openweather, kma etc
+	Source       WeatherSource    `json:"source"`
+	TargetDate   time.Time        `json:"target_date"`
+	ForecastDate time.Time        `json:"forecast_date"`
+	Condition    WeatherCondition `json:"condition"`
+	Temperature  Temperature      `json:"temperature,omitzero"`
 }

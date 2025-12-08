@@ -31,6 +31,8 @@ func NewHandler(broker broker.Broker, key string, lat float64, lon float64) *Han
 func (h *Handler) Handle(ctx context.Context) error {
 	log.Println("get forecast")
 
+	now := time.Now()
+
 	forecast, err := openweather.Forecast(ctx, h.key, h.lat, h.lon)
 	if err != nil {
 		return fmt.Errorf("error in get forecast: %w", err)
@@ -40,11 +42,13 @@ func (h *Handler) Handle(ctx context.Context) error {
 
 	for _, list := range forecast.List {
 		weatherEvent := domain.WeatherEvent{
-			Date:        time.Unix(int64(list.Dt), 0),
-			Condition:   decideCondition(list.Weather),
-			Temperature: &domain.Temperature{Value: domain.Celsius(list.Main.Temp)},
-			High:        &domain.Temperature{Value: domain.Celsius(list.Main.TempMax)},
-			Low:         &domain.Temperature{Value: domain.Celsius(list.Main.TempMin)},
+			Source:       domain.WeatherSourceOpenWeather,
+			ForecastDate: now,
+			TargetDate:   time.Unix(int64(list.Dt), 0),
+			Condition:    decideCondition(list.Weather),
+			Temperature: domain.Temperature{
+				Value: domain.Celsius(list.Main.Temp),
+			},
 		}
 
 		message, err := json.Marshal(&weatherEvent)
