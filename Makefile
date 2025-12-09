@@ -32,6 +32,7 @@ validate: fix test
 .PHONY: generate
 generate:
 	make -C api generate
+	go generate ./...
 
 .PHONY: cover
 cover:

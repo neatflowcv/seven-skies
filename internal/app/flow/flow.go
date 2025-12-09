@@ -90,12 +90,41 @@ func (*Flow) mergeWeathers(dateKey string, location *time.Location, weathers []*
 	date, _ := time.Parse("2006-01-02", dateKey)
 	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, location)
 
-	high := float64(weathers[0].Temperature().Value)
-	low := float64(weathers[0].Temperature().Value)
-	worstCondition := weathers[0].Condition()
+	// Source와 TargetDate가 동일한 경우, ForecastDate가 최신 항목만 선택
+	filteredWeathers := make(map[string]*domain.Weather)
 
-	for _, w := range weathers {
-		temp := float64(w.Temperature().Value)
+	for _, weather := range weathers {
+		key := string(weather.Source()) + weather.TargetDate().Format("2006-01-02")
+
+		existing, ok := filteredWeathers[key]
+		if !ok {
+			filteredWeathers[key] = weather
+
+			continue
+		}
+
+		if weather.ForecastDate().Before(existing.ForecastDate()) {
+			continue
+		}
+
+		filteredWeathers[key] = weather
+	}
+
+	var filteredSlice []*domain.Weather
+	for _, weather := range filteredWeathers {
+		filteredSlice = append(filteredSlice, weather)
+	}
+
+	if len(filteredSlice) == 0 {
+		panic("no weather found")
+	}
+
+	high := float64(filteredSlice[0].Temperature().Value)
+	low := float64(filteredSlice[0].Temperature().Value)
+	worstCondition := filteredSlice[0].Condition()
+
+	for _, weather := range filteredSlice {
+		temp := float64(weather.Temperature().Value)
 		if temp > high {
 			high = temp
 		}
@@ -104,19 +133,17 @@ func (*Flow) mergeWeathers(dateKey string, location *time.Location, weathers []*
 			low = temp
 		}
 
-		if w.Condition().IsWorseThan(worstCondition) {
-			worstCondition = w.Condition()
+		if weather.Condition().IsWorseThan(worstCondition) {
+			worstCondition = weather.Condition()
 		}
 	}
 
-	newVar := &DailyWeather{
+	return &DailyWeather{
 		Date:      date,
 		High:      high,
 		Low:       low,
 		Condition: string(worstCondition),
 	}
-
-	return newVar
 }
 
 func (*Flow) groupByDate(weathers []*domain.Weather, location *time.Location) map[string][]*domain.Weather {
