@@ -94,7 +94,7 @@ func (*Flow) mergeWeathers(dateKey string, location *time.Location, weathers []*
 	filteredWeathers := make(map[string]*domain.Weather)
 
 	for _, weather := range weathers {
-		key := string(weather.Source()) + weather.TargetDate().Format("2006-01-02")
+		key := string(weather.Source()) + weather.TargetDate().Format(time.DateTime)
 
 		existing, ok := filteredWeathers[key]
 		if !ok {
@@ -151,7 +151,7 @@ func (*Flow) groupByDate(weathers []*domain.Weather, location *time.Location) ma
 
 	for _, weather := range weathers {
 		localDate := weather.TargetDate().In(location)
-		dateKey := time.Date(localDate.Year(), localDate.Month(), localDate.Day(), 0, 0, 0, 0, location).Format("2006-01-02")
+		dateKey := time.Date(localDate.Year(), localDate.Month(), localDate.Day(), 0, 0, 0, 0, location).Format(time.DateOnly)
 		weathersByDate[dateKey] = append(weathersByDate[dateKey], weather)
 	}
 
