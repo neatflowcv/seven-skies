@@ -1,0 +1,8 @@
+image: registry.neatflow.kr/weather/seven-skies:v0.0.2
+ports:
+  - 8080
+env:
+  - name: NATS_URL
+    value: nats://nats-app:4222
+  - name: DATABASE_DSN
+    value: "host=postgres-app user=weather password=weather dbname=weather port=5432 sslmode=disable TimeZone=Asia/Seoul"

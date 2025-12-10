@@ -1,0 +1,10 @@
+image: docker.io/nats
+args:
+  - -js
+  - -sd
+  - /data
+ports:
+  - 4222
+volume:
+  enabled: true
+  path: /data

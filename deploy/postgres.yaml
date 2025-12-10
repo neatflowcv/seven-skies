@@ -1,0 +1,13 @@
+image: docker.io/postgres
+ports:
+  - 5432
+volume:
+  enabled: true
+  path: /var/lib/postgresql
+env:
+  - name: POSTGRES_DB
+    value: weather
+  - name: POSTGRES_USER
+    value: weather
+  - name: POSTGRES_PASSWORD
+    value: weather

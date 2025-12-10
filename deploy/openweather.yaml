@@ -1,0 +1,10 @@
+image: registry.neatflow.kr/weather/openweather:v0.0.1
+env:
+  - name: NATS_URL
+    value: nats://nats-app:4222
+  - name: OPENWEATHER_API_KEY
+    value: "96385ecb4429f7c32893457c0e545b05"
+  - name: OPENWEATHER_LAT
+    value: "37.485090"
+  - name: OPENWEATHER_LON
+    value: "126.928031"
