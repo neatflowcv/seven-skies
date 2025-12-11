@@ -1,0 +1,3 @@
+image: docker.io/caronc/apprise
+ports:
+  - 8080
