@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weather-notification
+spec:
+  schedule: "30 9 * * *"
+  timeZone: "Asia/Seoul"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: weather-notifier
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  apk add --no-cache curl jq
+
+                  # 날씨 데이터 가져오기
+                  WEATHER_DATA=$(curl -s seven-skies-app:8080/forecasts/daily | jq .items[0])
+
+                  # JSON 형식 변환 (date: condition high/low 형식)
+                  BODY=$(echo "$WEATHER_DATA" | jq -r '
+                    "\(.date): \(.condition) \(.high)/\(.low)"
+                  ')
+
+                  # Apprise API로 전송
+                  curl -X POST "http://apprise:8000/notify" \
+                    -H "Content-Type: application/json" \
+                    -d "{
+                      \"urls\": \"pover://ukqirq63ptby2z9ctgh67ae1636m2o@abiiap2zy7hzr9rt4vqybvqj8b24yq?priority=high\",
+                      \"body\": $(echo "$BODY" | jq -Rs .),
+                      \"title\": \"오늘의 날씨\"
+                    }"
+          restartPolicy: OnFailure
