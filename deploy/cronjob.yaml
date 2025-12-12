@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: weather-notification
 spec:
-  schedule: "30 9 * * *"
+  schedule: "30 8 * * *"
   timeZone: "Asia/Seoul"
   jobTemplate:
     spec:
